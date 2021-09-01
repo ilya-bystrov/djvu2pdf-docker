@@ -1,3 +1,6 @@
 [submodule "jbig2enc"]
 	path = jbig2enc
 	url = https://github.com/agl/jbig2enc
+[submodule "ImageMagick"]
+	path = ImageMagick
+	url = https://github.com/ImageMagick/ImageMagick
