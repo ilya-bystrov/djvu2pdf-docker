@@ -4,3 +4,6 @@
 [submodule "ImageMagick"]
 	path = ImageMagick
 	url = https://github.com/ImageMagick/ImageMagick
+[submodule "djvu2pdf"]
+	path = djvu2pdf
+	url = https://github.com/vindvaki/djvu2pdf.git
