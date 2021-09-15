@@ -15,6 +15,8 @@ other libraries like pdfbeads, djvulibre-bin, etc.
 Run details
 ===========
 
+* DockerHub: https://hub.docker.com/r/ilyabystrov/djvu2pdf
+
 ::
 
   docker run --rm -u $(id -u):$(id -g) -v $(pwd):/opt/work ilyabystrov/djvu2pdf filename.djvu filename.pdf
