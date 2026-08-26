@@ -1,43 +1,52 @@
-######################
-Containerized DjVu2PDF
-######################
+###############################
+Convert DjVu to PDF with Docker
+###############################
 
-A convenient way to convert files from `DjVu` to `PDF` format while preserving the text layer.
+Convert a DjVu file to PDF while preserving its text layer.
 
-The solution utilizes `djvu2pdf <https://github.com/vindvaki/djvu2pdf>`_ script, which, in turn, depends on 
-other libraries like pdfbeads, djvulibre-bin, etc.
+Prerequisite
+============
 
-* All dependencies are packed into docker image (amd64).
-* Some libraries are installed from source in order to utilize specific features: JBIG2 and JPEG 2000 (JP2)
-  compression support.
-* JP2 configuration in pdfbeads is modified.
+Install Docker before starting.
 
-Run details
-===========
+Quickstart
+==========
 
-* DockerHub: https://hub.docker.com/r/ilyabystrov/djvu2pdf
+Place the input file in your current directory, then run:
 
 ::
 
-  docker run --rm -u $(id -u):$(id -g) -v $(pwd):/opt/work ilyabystrov/djvu2pdf filename.djvu filename.pdf
+  docker run --rm -u $(id -u):$(id -g) -v "$PWD:/opt/work" ilyabystrov/djvu2pdf input.djvu output.pdf
 
-* `--rm` option - removing container after execution
-* `-u $(id -u):$(id -g)` - run process with the same UID and GID
-* -v $(pwd):/opt/work - **(required)** bind mounting of the current directory to the working directory in the 
-  container
+Replace `input.djvu` and `output.pdf` with your file names. The current directory must be mounted into the
+container so the input and output files are available.
+
+The command:
+
+* `--rm` removes the container after conversion.
+* `-u $(id -u):$(id -g)` creates the output file with your user and group IDs.
+* `-v "$PWD:/opt/work"` mounts the current directory as the container's working directory.
+
+Docker image
+============
+
+* Docker Hub: https://hub.docker.com/r/ilyabystrov/djvu2pdf
+* The image currently supports amd64.
+
+The image includes all conversion dependencies, including `pdfbeads` and `djvulibre-bin`. It also includes
+JBIG2 and JPEG 2000 (JP2) compression support.
 
 Alias
------
+=====
 
-Put the following line into `~/.bashrc` or a similar configuration file:
+To use `djvu2pdf` as a short command, add this line to `~/.bashrc` or a similar shell configuration file:
+
+::
+
+  alias djvu2pdf='docker run --rm -u $(id -u):$(id -g) -v "$PWD:/opt/work" ilyabystrov/djvu2pdf'
+
+Then convert files with:
 
 ::
 
-  alias djvu2pdf='docker run --rm -u $(id -u):$(id -g) -v $(pwd):/opt/work ilyabystrov/djvu2pdf'
-
-It will allow using the short command
-
-::
-  
-  djvu2pdf filename.djvu filename.pdf
-
+  djvu2pdf input.djvu output.pdf
