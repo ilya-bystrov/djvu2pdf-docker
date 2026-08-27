@@ -43,6 +43,15 @@ RUN gem install --no-document iconv pdfbeads \
     && sed -i 's/File\.exists?/File.exist?/g' \
         /var/lib/gems/*/gems/pdfbeads-*/lib/pdfbeads/pdfpage.rb
 
+# Configure JP2 settings with defaults that can be overridden at runtime.
+# based on https://github.com/ifad/pdfbeads/issues/3
+# based on https://github.com/MasDenBy/djvu2pdf-docker/pull/1
+RUN find /var/lib/gems -path '*/pdfbeads-*/lib/pdfbeads/pdfpage.rb' -exec \
+  sed -i \
+  -e "s/'JP2','numrlvls',[0-9]*/'JP2','numrlvls',ENV.fetch('JP2_NUMRLVLS', '4').to_i/" \
+  -e "s/'JP2','rate',[0-9.]*/'JP2','rate',ENV.fetch('JP2_RATE', '256').to_f/" \
+  {} \;
+
 # Build ImageMagick from the checked-out compatible source version.
 COPY ImageMagick /opt/ImageMagick
 WORKDIR /opt/ImageMagick
