@@ -56,18 +56,22 @@ FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LD_LIBRARY_PATH=/usr/local/lib \
-    PATH=/opt/djvu2pdf:/usr/local/bin:$PATH
+    PATH=/opt/djvu2pdf:/usr/local/bin:$PATH \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
 
 # Install runtime packages
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         djvulibre-bin \
         libtiff-tools \
+        locales \
         python3-djvu \
         python3-lxml \
         python3-pip \
         ruby \
         ruby-rmagick \
+    && locale-gen C.UTF-8 \
     && python3 -m pip install \
         --break-system-packages \
         --no-cache-dir \
