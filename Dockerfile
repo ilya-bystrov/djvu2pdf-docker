@@ -1,42 +1,29 @@
-FROM public.ecr.aws/lts/ubuntu:26.04_stable
+FROM public.ecr.aws/lts/ubuntu:26.04_stable AS builder
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    LD_LIBRARY_PATH=/usr/local/lib \
-    PATH=/opt/djvu2pdf:/usr/local/bin:$PATH
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /opt
 
-# Enable source repositories
+# Enable source repositories and install build dependencies
 RUN sed -i 's/^Types: deb$/Types: deb deb-src/' \
-        /etc/apt/sources.list.d/ubuntu.sources
-
-# Install build dependencies
-RUN apt-get update \
+        /etc/apt/sources.list.d/ubuntu.sources \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
         automake \
         build-essential \
-        libopenjp2-7-dev \
         libleptonica-dev \
-    && apt-get build-dep -y imagemagick \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install runtime packages
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        djvulibre-bin \
-        libtiff-tools \
-        python3-djvu \
-        python3-lxml \
-        python3-pip \
+        libopenjp2-7-dev \
         ruby \
         ruby-dev \
         ruby-rmagick \
+    && apt-get build-dep -y imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-RUN python3 -m pip install \
-        --break-system-packages \
-        --no-cache-dir \
-        --no-deps \
-        ocrodjvu==0.14
+# Build ImageMagick from the checked-out compatible source version.
+COPY ImageMagick /opt/ImageMagick
+WORKDIR /opt/ImageMagick
+RUN ./configure \
+    && make -j"$(nproc)" install \
+    && ldconfig
 
 # Install Ruby dependencies
 RUN gem install --no-document iconv pdfbeads \
@@ -52,13 +39,6 @@ RUN find /var/lib/gems -path '*/pdfbeads-*/lib/pdfbeads/pdfpage.rb' -exec \
   -e "s/'JP2','rate',[0-9.]*/'JP2','rate',ENV.fetch('JP2_RATE', '256').to_f/" \
   {} \;
 
-# Build ImageMagick from the checked-out compatible source version.
-COPY ImageMagick /opt/ImageMagick
-WORKDIR /opt/ImageMagick
-RUN ./configure \
-    && make -j"$(nproc)" install \
-    && ldconfig
-
 # Build the bundled JBIG2 encoder against Ubuntu 26.04 Leptonica.
 COPY jbig2enc /opt/jbig2enc
 WORKDIR /opt/jbig2enc
@@ -71,6 +51,38 @@ RUN sed -i 's/AC_CHECK_LIB(\[lept\]/AC_CHECK_LIB([leptonica]/' configure.ac \
     && ./configure \
     && make -j"$(nproc)" install \
     && ldconfig
+
+FROM public.ecr.aws/lts/ubuntu:26.04_stable
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LD_LIBRARY_PATH=/usr/local/lib \
+    PATH=/opt/djvu2pdf:/usr/local/bin:$PATH
+
+# Install runtime packages
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        djvulibre-bin \
+        libtiff-tools \
+        python3-djvu \
+        python3-lxml \
+        python3-pip \
+        ruby \
+        ruby-rmagick \
+    && python3 -m pip install \
+        --break-system-packages \
+        --no-cache-dir \
+        --no-deps \
+        ocrodjvu==0.14 \
+    && apt-get purge -y python3-pip \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only artifacts installed by the builder.
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
+COPY --from=builder /usr/local/lib/ /usr/local/lib/
+COPY --from=builder /usr/local/share/ /usr/local/share/
+COPY --from=builder /var/lib/gems/ /var/lib/gems/
+RUN ldconfig
 
 # Install djvu2pdf application
 COPY djvu2pdf /opt/djvu2pdf
