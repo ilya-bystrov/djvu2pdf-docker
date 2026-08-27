@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lts/ubuntu:26.04_stable AS builder
+FROM ubuntu:26.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt
@@ -52,7 +52,7 @@ RUN sed -i 's/AC_CHECK_LIB(\[lept\]/AC_CHECK_LIB([leptonica]/' configure.ac \
     && make -j"$(nproc)" install \
     && ldconfig
 
-FROM public.ecr.aws/lts/ubuntu:26.04_stable
+FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LD_LIBRARY_PATH=/usr/local/lib \
