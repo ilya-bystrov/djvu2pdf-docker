@@ -23,15 +23,16 @@ container so the input and output files are available.
 
 The command:
 
-* `--rm` removes the container after conversion.
-* `-u $(id -u):$(id -g)` creates the output file with your user and group IDs.
-* `-v "$PWD:/opt/work"` mounts the current directory as the container's working directory.
+* ``--rm`` removes the container after conversion.
+* ``-u $(id -u):$(id -g)`` creates the output file with your user and group IDs.
+* ``-v "$PWD:/opt/work"`` mounts the current directory as the container's working directory.
 
 Docker image
 ============
 
 * Docker Hub: https://hub.docker.com/r/ilyabystrov/djvu2pdf
 * The image currently supports amd64.
+* The Docker image is small, at approximately 150 MB.
 
 The image includes all conversion dependencies, including `pdfbeads` and `djvulibre-bin`. It also includes
 JBIG2 and JPEG 2000 (JP2) compression support.
