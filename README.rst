@@ -18,20 +18,21 @@ Place the input file in your current directory, then run:
 
   docker run --rm -u $(id -u):$(id -g) -v "$PWD:/opt/work" ilyabystrov/djvu2pdf input.djvu output.pdf
 
-Replace `input.djvu` and `output.pdf` with your file names. The current directory must be mounted into the
+Replace ``input.djvu`` and ``output.pdf`` with your file names. The current directory must be mounted into the
 container so the input and output files are available.
 
 The command:
 
-* `--rm` removes the container after conversion.
-* `-u $(id -u):$(id -g)` creates the output file with your user and group IDs.
-* `-v "$PWD:/opt/work"` mounts the current directory as the container's working directory.
+* ``--rm`` removes the container after conversion.
+* ``-u $(id -u):$(id -g)`` creates the output file with your user and group IDs.
+* ``-v "$PWD:/opt/work"`` mounts the current directory as the container's working directory.
 
 Docker image
 ============
 
 * Docker Hub: https://hub.docker.com/r/ilyabystrov/djvu2pdf
 * The image currently supports amd64.
+* The Docker image is small, at approximately 150 MB.
 
 The image includes all conversion dependencies, including `pdfbeads` and `djvulibre-bin`. It also includes
 JBIG2 and JPEG 2000 (JP2) compression support.
@@ -50,3 +51,20 @@ Then convert files with:
 ::
 
   djvu2pdf input.djvu output.pdf
+
+Changelog
+=========
+
+August 2026
+-----------
+
+* Switched to the official Ubuntu 26.04 image and modernized dependencies.
+* Reduced the runtime image size with a multi-stage Docker build.
+* Added runtime overrides for JP2 encoding settings.
+* Added UTF-8 locale support for non-Latin filenames.
+* Clarified Docker usage and documented the approximate 150 MB image size.
+
+September 2021
+-------------
+
+* Created the Docker image and added the DjVu-to-PDF conversion setup.
