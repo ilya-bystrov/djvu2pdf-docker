@@ -59,10 +59,9 @@ August 2026
 -----------
 
 * Switched to the official Ubuntu 26.04 image and modernized dependencies.
-* Reduced the runtime image size with a multi-stage Docker build.
+* Reduced the runtime image size to approximately 150 MB using a multi-stage Docker build.
 * Added runtime overrides for JP2 encoding settings.
 * Added UTF-8 locale support for non-Latin filenames.
-* Clarified Docker usage and documented the approximate 150 MB image size.
 
 September 2021
 -------------
